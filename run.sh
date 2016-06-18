@@ -1,9 +1,10 @@
-REMOTE_PATH=arxiv@v22016041720733360.quicksrv.de:/home/arxiv/arxiv-sanity-preserver
+REMOTE_PATH=arxiv@mc.nolife.de:/home/arxiv/arxiv-sanity-preserver
+REMOTE_PORT=2342
 
 source ./env/bin/activate
 
 # pull the database (by default stored in as.db) from remote to local
-rsync -v --progress $REMOTE_PATH/as.db as.db
+rsync -e "ssh -p $REMOTE_PORT" -v --progress $REMOTE_PATH/as.db as.db
 
 # now perform the update and recomputation:
 sh fetch_new.sh
@@ -14,5 +15,5 @@ python analyze.py
 python buildsvm.py
 
 # now rsync the results and new thumbnails from local to remote
-rsync -v --progress db.p tfidf_meta.p sim_dict.p user_sim.p $REMOTE_PATH
-rsync -vrL --progress static/thumbs $REMOTE_PATH/static
+rsync -e "ssh -p $REMOTE_PORT" -v --progress db.p tfidf_meta.p sim_dict.p user_sim.p $REMOTE_PATH
+rsync -e "ssh -p $REMOTE_PORT" -vaL --progress static/thumbs $REMOTE_PATH/static
